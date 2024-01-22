@@ -84,6 +84,13 @@ const parseInput = (e) => {
         }
         // If input is an operator
         else if (operators.includes(input)) {
+            // Check for divide by 0
+            if (operator === "÷" && parseFloat(secondNum) === 0) {
+                alert("THOU CAN NOT DIVIDETH BY NIL! ALL DATA SHALT BE EXPUNGED!");
+                clearData();
+                updateDisplay();
+                return;
+            }
             let result = operate().toString();
             clearData()
             firstNum = result;
@@ -95,7 +102,6 @@ const parseInput = (e) => {
             updateDisplay();
         }
     }
-    printData();
 }
 
 const operate = () => {
