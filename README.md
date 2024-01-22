@@ -18,4 +18,5 @@ Program Decomposition
 6. Create delete function
 7. Create clear function
 8. Prevent division by 0
-8. Support decimal functionality
+9. Support decimal functionality
+10. Add keyboard functionality?

@@ -6,7 +6,6 @@ let currStep = "firstNum";
 
 const displayScreen = document.querySelector('#screen');
 const operators = "+-×÷=";
-const decimal = "."
 
 const main = () => {
     makeEventListeners();
@@ -49,11 +48,15 @@ const parseInput = (e) => {
         }
         // If input is a valid operator and we have numbers, change to operator step
         else if (operators.includes(input)) {
-            if (input !== "=" && displayValue.length > 0) {
-                console.log('test');
+            if (input !== "=" && displayValue.length > 0 && displayValue[displayValue.length - 1] !== ".") {
                 currStep = "operator";
                 operator = input;
             }
+        }
+        else if (input === "." && firstNum.length < 8 && !firstNum.includes(".")) {
+            firstNum += input;
+            displayValue = firstNum;
+            updateDisplay();
         }
     }
     else if (currStep === "operator") {
@@ -62,7 +65,7 @@ const parseInput = (e) => {
             operator = input;
         }
         // If input is a number
-        else if (!isNaN(input)) {
+        else if (!isNaN(input) || input === ".") {
             currStep = "secondNum";
             secondNum = input;
             displayValue = secondNum;
@@ -91,14 +94,29 @@ const parseInput = (e) => {
                 updateDisplay();
                 return;
             }
-            let result = operate().toString();
+            let result = keepAtNineDigits(operate()).toString()
+            console.log(result);
+            if (result === "TOO LARGE") {
+                return;
+            }
+            if (parseFloat(result) > 999999999) {
+                alert("ERROR: NUMBER TOO LARGE. CLEANSING DATA")
+                clearData();
+                updateDisplay();
+                return;
+            }
             clearData()
-            firstNum = result;
+            firstNum = result.toString();
             if (input !== "=") {
                 operator = input;
                 currStep = "operator";
             }
             displayValue = firstNum;
+            updateDisplay();
+        }
+        else if (input === "." && secondNum.length < 8 && !secondNum.includes(".")) {
+            secondNum += input;
+            displayValue = secondNum;
             updateDisplay();
         }
     }
@@ -140,6 +158,32 @@ const clearData = () => {
 const printData = () => {
     console.log("NUM1:", firstNum, "NUM2:", secondNum, "OP:", 
     operator, "CURRSTEP:", currStep, "DISPLAYVAL:", displayValue)
+}
+
+const keepAtNineDigits = (num) => {
+    if (num > 999999999) {
+        alert("ERROR: NUMBER TOO LARGE. CLEARING DATA")
+        clearData();
+        updateDisplay();
+        return "TOO LARGE";
+    }
+    num = num.toString();
+    if (num.includes(".")) {
+        let index = num.indexOf(".")
+        let maxIndex = 8;
+        let numsAfterDecimal = maxIndex - index;
+        let answer = round(parseFloat(num), numsAfterDecimal)
+        if (answer.toString().includes('e')){
+            return 0;
+        }
+        return answer;
+    }
+    return parseFloat(num)
+}
+
+const round = (num, decimalPlace) => {
+    num *= Math.pow(10, decimalPlace);
+    return Math.round(num) / Math.pow(10, decimalPlace);
 }
 
 main()
